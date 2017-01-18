@@ -1,0 +1,3 @@
+[submodule "clean-code-javascript"]
+	path = clean-code-javascript
+	url = https://github.com/ryanmcdermott/clean-code-javascript
