@@ -202,14 +202,25 @@ dadurch die Testbarkeit deiner Funktion erleichtert wird. Mehr als drei Argument
 führen zu einer kombinatorischen Explosion und du musst unzählige verschiedene 
 Fälle mit jedem einzelnen Argument testen.
 
-Keine Argumente ist der ideale Fall. Ein oder zwei Argumente sind okay, drei 
-sollten aber vermieden werden. Alles darüber sollte zusammengefasst werden. Meistens
-erledigt deine Funktion zu viel, wenn du mehr als zwei Argumente benötigst. 
-Falls nicht, reicht es ein übergeordnetes Objekt als Argument zu übergeben.
+Ein bis zwei Argumente sind ideal, drei sollten aber wenn möglich vermieden werden. 
+Alles darüber sollte zusammengefasst werden. Meistens erledigt deine Funktion zu viel, 
+wenn du mehr als zwei Argumente benötigst. Falls nicht, reicht es ein übergeordnetes 
+Objekt als Argument zu übergeben.
 
 Weil uns JavaScript erlaubt Objekte on-the-fly und ohne viel Klassen-Boilerplate zu 
 erstellen, kannst du Objekte verwenden wenn du merkst, dass du eine Menge Argumente
 benötigst.
+
+Um deutlich zu machen, welche Eigenschaften eine Funktion erwartet, kannst du die ES6 
+destruktierende Zuweisung verwenden. Diese hat einige Vorteile:
+
+1. Wenn sich jemand die Methodensignatur anschaut, wird unmittelbar klar, welche Eigenschaften 
+verwendet werden.
+2. Die destruktierende Zuweisung klont die spezifiziert primitiven Datentypen, die in die Funktion 
+übergeben werden. Das kann helfen, Nebeneffekte zu verhindern. Anmerkung: Objekte und Arrays werden 
+NICHT geklont.
+3. Linter können dich vor unbenutzten Eigenschaften warnen. Das wäre ohne die destruktierende Zuweisung 
+unmöglich.
 
 **Schlecht:**
 ```javascript
@@ -220,7 +231,7 @@ function createMenu(title, body, buttonText, cancellable) {
 
 **Gut:**
 ```javascript
-function createMenu(config) {
+function createMenu({ title, body, buttonText, cancellable }) {
   // ...
 }
 
@@ -689,9 +700,11 @@ const programmerOutput = [
   }
 ];
 
+const INITIAL_VALUE = 0;
+
 const totalOutput = programmerOutput
   .map((programmer) => programmer.linesOfCode)
-  .reduce((acc, linesOfCode) => acc + linesOfCode, 0);
+  .reduce((acc, linesOfCode) => acc + linesOfCode, INITIAL_VALUE);
 ```
 **[⬆ nach oben](#table-of-contents)**
 
@@ -951,7 +964,7 @@ class BankAccount {
 
   // `get` oder `set` müssen nicht vorangestellt sein um ein Getter/Setter zu sein
   set balance(amount) {
-    if (verifyIfAmountCanBeSetted(amount)) {
+    if (this.verifyIfAmountCanBeSetted(amount)) {
       this._balance = amount;
     }
   }
@@ -2174,5 +2187,8 @@ const actions = function() {
 Dieser Leitfaden ist in den folgenden Sprachen verfügbar:
 
 - ![en](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags-iso/shiny/24/US.png) **Englisch**: [ryanmcdermott/clean-code-javascript](https://github.com/ryanmcdermott/clean-code-javascript)
+- ![br](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) **Brazilian Portuguese**: [fesnt/clean-code-javascript](https://github.com/fesnt/clean-code-javascript)
+- ![cn](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **Chinese**: [alivebao/clean-code-js](https://github.com/alivebao/clean-code-js)
+- ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [qkraudghgh/clean-code-javascript-ko](https://github.com/qkraudghgh/clean-code-javascript-ko)
 
 **[⬆ nach oben](#table-of-contents)**
