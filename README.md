@@ -176,6 +176,9 @@ function paintCar(car) {
 **[⬆ nach oben](#table-of-contents)**
 
 ### Verwende Default-Werte anstatt Short-Circuiting oder Bedingungen
+Default-Werte sind meistens sauberer als Short-Circuiting. Sei dir aber bewusst, dass 
+deine Funktion nur Default-Werte für `undefined`-Argumente vergibt. Andere „falsche“ Werte 
+wie beispielsweise `''`, `false`, `null`, `0` und `NaN` werden nicht durch Default-Werte ersetzt.
 
 **Schlecht:**
 ```javascript
@@ -236,7 +239,6 @@ function createMenu({ title, body, buttonText, cancellable }) {
 }
 
 createMenu({
-  title: 'Foo',
   title: 'Foo',
   body: 'Bar',
   buttonText: 'Baz',
@@ -431,7 +433,7 @@ function showManagerList(managers) {
 
 **Gut:**
 ```javascript
-function showList(employees) {
+function showEmployeeList(employees) {
   employees.forEach((employee) => {
     const expectedSalary = employee.calculateExpectedSalary();
     const experience = employee.getExperience();
@@ -820,7 +822,7 @@ Möglichkeiten, dies zu vermeiden. Der erste Schritt ist, auf einheitliche Schni
 ```javascript
 function travelToTexas(vehicle) {
   if (vehicle instanceof Bicycle) {
-    vehicle.peddle(this.currentLocation, new Location('texas'));
+    vehicle.pedal(this.currentLocation, new Location('texas'));
   } else if (vehicle instanceof Car) {
     vehicle.drive(this.currentLocation, new Location('texas'));
   }
@@ -1012,13 +1014,15 @@ console.log(`Employee name: ${employee.getName()}`); // Employee name: undefined
 
 **Gut:**
 ```javascript
-const Employee = function (name) {
-  this.getName = function getName() {
-    return name;
+function makeEmployee(name) {
+  return {
+    getName() {
+      return name;
+    },
   };
-};
+}
 
-const employee = new Employee('John Doe');
+const employee = makeEmployee('John Doe');
 console.log(`Employee name: ${employee.getName()}`); // Employee name: John Doe
 delete employee.name;
 console.log(`Employee name: ${employee.getName()}`); // Employee name: John Doe
@@ -1385,7 +1389,6 @@ const $ = new DOMTraverser({
 
 ### Dependency-Inversion-Prinzip (DIP)
 Dieses Prinzip steht für zwei essentielle Dinge:
-
 1. übergeordnete Module sollten nicht von untergeordneten Modulen abhängig 
 sein. Beide sollten von Abstraktionen abhängig sein.
 2. Abstraktionen sollten nicht von Details abhängig sein. Details sollten 
@@ -1733,7 +1736,7 @@ describe('MakeMomentJSGreatAgain', () => {
 
     date = new MakeMomentJSGreatAgain('1/1/2015');
     date.addDays(30);
-    date.shouldEqual('1/31/2015');
+    assert.equal('1/31/2015', date);
 
     date = new MakeMomentJSGreatAgain('2/1/2016');
     date.addDays(28);
@@ -1754,7 +1757,7 @@ describe('MakeMomentJSGreatAgain', () => {
   it('handles 30-day months', () => {
     const date = new MakeMomentJSGreatAgain('1/1/2015');
     date.addDays(30);
-    date.shouldEqual('1/31/2015');
+    assert.equal('1/31/2015', date);
   });
 
   it('handles leap year', () => {
@@ -2190,5 +2193,6 @@ Dieser Leitfaden ist in den folgenden Sprachen verfügbar:
 - ![br](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) **Brazilian Portuguese**: [fesnt/clean-code-javascript](https://github.com/fesnt/clean-code-javascript)
 - ![cn](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **Chinese**: [alivebao/clean-code-js](https://github.com/alivebao/clean-code-js)
 - ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [qkraudghgh/clean-code-javascript-ko](https://github.com/qkraudghgh/clean-code-javascript-ko)
+- ![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) **Russian**: [BoryaMogila/clean-code-javascript-ru/](https://github.com/BoryaMogila/clean-code-javascript-ru/)
 
 **[⬆ nach oben](#table-of-contents)**
