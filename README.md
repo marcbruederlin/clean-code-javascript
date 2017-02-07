@@ -505,8 +505,8 @@ createMenu(menuConfig);
 
 ### Verwende keine Flags als Funktionsparameter
 Flags zeigen dem Anwender dass diese Funktion mehr als eine Sache macht. Funktionen sollten 
-nur eine Sache erledigen. Teile deine Funktionen auf, wenn diese auf Basis eines Boolean 
-andere Pfad verwenden.
+nur eine Sache erledigen. Teile deine Funktionen auf, wenn diese beispielsweise auf Basis eines 
+Boolean andere Pfade verwendet.
 
 **Schlecht:**
 ```javascript
@@ -925,12 +925,9 @@ inventoryTracker('apples', req, 'www.inventory-awesome.io');
 
 ## <a id='objects-and-data-structures'>Objekte und Datenstrukturen</a>
 ### Verwende Getter und Setter
-JavaScript besitzt keine Interfaces oder Typen. Es ist also sehr schwer dieses 
-Entwurfsmuster durchzuführen, weil wir keine Keywords wie `public` und `private` 
-haben. Wie es auch ist, Getter und Setter zu verwenden – um Zugriff auf Daten eines 
-Objekts zu bekommen – ist um einiges besser als einfach nach der Eigenschaft eines 
-Objekts zu schauen. „Warum?“ fragst du dich vielleicht. Nun, hier ist eine ungeordnete 
-Liste mit Gründen:
+Getter und Setter zu verwenden, um Zugriff auf Daten eines Objekts zu bekommen, ist um 
+einiges besser als einfach nach der Eigenschaft eines Objekts zu schauen. „Warum?“ fragst 
+du dich vielleicht. Nun, hier ist eine ungeordnete Liste mit Gründen:
 
 * Wenn du mehr als nur das Erhalten eines Objekt-Eigenschaft erledigen möchtest, muss du 
 nicht alle Zugrifssmethoden in deinem Code anpassen.
@@ -938,56 +935,51 @@ nicht alle Zugrifssmethoden in deinem Code anpassen.
 * Verschachtelt die interne Darstellung.
 * Macht es einfach, Logging und Fehlerbehandlung hinzuzufügen, wenn Daten gespeichert 
 oder abgerufen werden.
-* Du kannst von dieser Klasse erben und die standardmäßige Funktionalität überschreiben.
 * Du kannst die Eigenschaften eines Objekts mittels lazy-loading laden. Beispielsweise von 
 einem Server.
 
 
 **Schlecht:**
 ```javascript
-class BankAccount {
-  constructor() {
-    this.balance = 1000;
-  }
+function makeBankAccount() {
+  // ...
+
+  return {
+    balance: 0,
+    // ...
+  };
 }
 
-const bankAccount = new BankAccount();
-
-// Kaufe Schuhe...
-bankAccount.balance -= 100;
+const account = makeBankAccount();
+account.balance = 100;
 ```
 
 **Gut:**
 ```javascript
-class BankAccount {
-  constructor(balance = 1000) {
-    this._balance = balance;
+function makeBankAccount() {
+  // Diese Variable ist privat
+  let balance = 0;
+
+  // Ein "Getter", wird duch das unten zurückgegebene Objekt public gemacht
+  function getBalance() {
+    return balance;
   }
 
-  // `get` oder `set` müssen nicht vorangestellt sein um ein Getter/Setter zu sein
-  set balance(amount) {
-    if (this.verifyIfAmountCanBeSetted(amount)) {
-      this._balance = amount;
-    }
+  // Ein "Setter", wird duch das unten zurückgegebene Objekt public gemacht
+  function setBalance(amount) {
+    // ... validieren, bevor der Kontostand aktualisiert wird
+    balance = amount;
   }
 
-  get balance() {
-    return this._balance;
-  }
-
-  verifyIfAmountCanBeSetted(val) {
+  return {
     // ...
-  }
+    getBalance,
+    setBalance,
+  };
 }
 
-const bankAccount = new BankAccount();
-
-// Kaufe Schuhe...
-bankAccount.balance -= shoesPrice;
-
-// Lade den Kontostand
-let balance = bankAccount.balance;
-
+const account = makeBankAccount();
+account.setBalance(100);
 ```
 **[⬆ nach oben](#table-of-contents)**
 
@@ -1258,17 +1250,9 @@ class Shape {
 }
 
 class Rectangle extends Shape {
-  constructor() {
+  constructor(width, height) {
     super();
-    this.width = 0;
-    this.height = 0;
-  }
-
-  setWidth(width) {
     this.width = width;
-  }
-
-  setHeight(height) {
     this.height = height;
   }
 
@@ -1278,12 +1262,8 @@ class Rectangle extends Shape {
 }
 
 class Square extends Shape {
-  constructor() {
+  constructor(length) {
     super();
-    this.length = 0;
-  }
-
-  setLength(length) {
     this.length = length;
   }
 
@@ -1294,21 +1274,12 @@ class Square extends Shape {
 
 function renderLargeShapes(shapes) {
   shapes.forEach((shape) => {
-    switch (shape.constructor.name) {
-      case 'Square':
-        shape.setLength(5);
-        break;
-      case 'Rectangle':
-        shape.setWidth(4);
-        shape.setHeight(5);
-    }
-
     const area = shape.getArea();
     shape.render(area);
   });
 }
 
-const shapes = [new Rectangle(), new Rectangle(), new Square()];
+const shapes = [new Rectangle(4, 5), new Rectangle(4, 5), new Square(5)];
 renderLargeShapes(shapes);
 ```
 **[⬆ nach oben](#table-of-contents)**
@@ -2193,6 +2164,9 @@ Dieser Leitfaden ist in den folgenden Sprachen verfügbar:
 - ![br](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) **Brazilian Portuguese**: [fesnt/clean-code-javascript](https://github.com/fesnt/clean-code-javascript)
 - ![cn](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **Chinese**: [alivebao/clean-code-js](https://github.com/alivebao/clean-code-js)
 - ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [qkraudghgh/clean-code-javascript-ko](https://github.com/qkraudghgh/clean-code-javascript-ko)
-- ![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) **Russian**: [BoryaMogila/clean-code-javascript-ru/](https://github.com/BoryaMogila/clean-code-javascript-ru/)
+- ![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) **Russian**:
+  - [BoryaMogila/clean-code-javascript-ru/](https://github.com/BoryaMogila/clean-code-javascript-ru/)
+  - [maksugr/clean-code-javascript](https://github.com/maksugr/clean-code-javascript)
+- ![vi](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Vietnam.png) **Vietnamese**: [hienvd/clean-code-javascript/](https://github.com/hienvd/clean-code-javascript/)
 
 **[⬆ nach oben](#table-of-contents)**
