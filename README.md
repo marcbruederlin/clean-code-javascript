@@ -8,12 +8,13 @@ Original Repository: [ryanmcdermott/clean-code-javascript](https://github.com/ry
   3. [Funktionen](#functions)
   4. [Objekte und Datenstrukturen](#objects-and-data-structures)
   5. [Klassen](#classes)
-  6. [Testing](#testing)
-  7. [Parallelität](#concurrency)
-  8. [Fehlerbehandlung](#error-handling)
-  9. [Formatierung](#formatting)
-  10. [Kommentare](#comments)
-  11. [Übersetzungen](#translation)
+  6. [SOLID](#solid)
+  7. [Testing](#testing)
+  8. [Parallelität](#concurrency)
+  9. [Fehlerbehandlung](#error-handling)
+  10. [Formatierung](#formatting)
+  11. [Kommentare](#comments)
+  12. [Übersetzungen](#translation)
 
 ## <a id='introduction'>Einführung</a>
 ![Humorous image of software quality estimation as a count of how many expletives
@@ -83,7 +84,6 @@ können dabei helfen, unbenannte Konstanten zu finden.
 ```javascript
 // Wofür steht 86400000?
 setTimeout(blastOff, 86400000);
-
 ```
 
 **Gut:**
@@ -92,7 +92,6 @@ setTimeout(blastOff, 86400000);
 const MILLISECONDS_IN_A_DAY = 86400000;
 
 setTimeout(blastOff, MILLISECONDS_IN_A_DAY);
-
 ```
 **[⬆ nach oben](#table-of-contents)**
 
@@ -186,7 +185,6 @@ function createMicrobrewery(name) {
   const breweryName = name || 'Hipster Brew Co.';
   // ...
 }
-
 ```
 
 **Gut:**
@@ -194,7 +192,6 @@ function createMicrobrewery(name) {
 function createMicrobrewery(breweryName = 'Hipster Brew Co.') {
   // ...
 }
-
 ```
 **[⬆ nach oben](#table-of-contents)**
 
@@ -246,7 +243,6 @@ createMenu({
 });
 ```
 **[⬆ nach oben](#table-of-contents)**
-
 
 ### Funktionen sollten eine Sache erledigen
 Dies ist bei weitem die wichtigste Regel in der Softwareentwicklung. Wenn Funktionen
@@ -481,7 +477,7 @@ createMenu(menuConfig);
 ```javascript
 const menuConfig = {
   title: 'Order',
-  // User did not include 'body' key
+  // Der User hat den 'body'-Key nicht angegeben
   buttonText: 'Send',
   cancellable: true
 };
@@ -501,7 +497,6 @@ function createMenu(config) {
 createMenu(menuConfig);
 ```
 **[⬆ nach oben](#table-of-contents)**
-
 
 ### Verwende keine Flags als Funktionsparameter
 Flags zeigen dem Anwender dass diese Funktion mehr als eine Sache macht. Funktionen sollten 
@@ -876,7 +871,6 @@ derweil auf diese Dinge bis sie behoben sind – wenn sie behoben werden können
 
 **Schlecht:**
 ```javascript
-
 // In alten Browsern würde jeder Durchlauf mit einem ungespeicherten `list.length` speicherintensiv sein,
 // weil `list.length` in jedem Durchlauf neu berechnet wird. In modernen Browsern ist das optimiert.
 for (let i = 0, len = list.length; i < len; i++) {
@@ -909,7 +903,6 @@ function newRequestModule(url) {
 
 const req = newRequestModule;
 inventoryTracker('apples', req, 'www.inventory-awesome.io');
-
 ```
 
 **Gut:**
@@ -937,7 +930,6 @@ nicht alle Zugrifssmethoden in deinem Code anpassen.
 oder abgerufen werden.
 * Du kannst die Eigenschaften eines Objekts mittels lazy-loading laden. Beispielsweise von 
 einem Server.
-
 
 **Schlecht:**
 ```javascript
@@ -983,13 +975,11 @@ account.setBalance(100);
 ```
 **[⬆ nach oben](#table-of-contents)**
 
-
 ### Sorge dafür, dass Objekte private Member besitzen
 Dies kann durch Closures erreicht werden (für ES5 und darunter).
 
 **Schlecht:**
 ```javascript
-
 const Employee = function(name) {
   this.name = name;
 };
@@ -1021,8 +1011,231 @@ console.log(`Employee name: ${employee.getName()}`); // Employee name: John Doe
 ```
 **[⬆ nach oben](#table-of-contents)**
 
-
 ## <a id='classes'>Klassen</a>
+### Ziehe ES2015-/ES6-Klassen einfachen ES5-Funktionen vor
+Es ist sehr schwer, lesbare Klassen-Vererbungen, Konstruktionen und Methoden-Definitionen mit 
+klassischen ES5-Klassen zu schreiben. Wenn du Vererbungen benötigst (und sei dir bewusst, dass 
+du es möglicherweise doch nicht brauchst), dann bevorzuge Klassen. Verwende schlanke 
+Funktionen bis du dir sicher bist, größere und komplexere Objekte zu benötigen.
+
+**Schlecht:**
+```javascript
+const Animal = function(age) {
+  if (!(this instanceof Animal)) {
+    throw new Error('Instantiate Animal with `new`');
+  }
+
+  this.age = age;
+};
+
+Animal.prototype.move = function move() {};
+
+const Mammal = function(age, furColor) {
+  if (!(this instanceof Mammal)) {
+    throw new Error('Instantiate Mammal with `new`');
+  }
+
+  Animal.call(this, age);
+  this.furColor = furColor;
+};
+
+Mammal.prototype = Object.create(Animal.prototype);
+Mammal.prototype.constructor = Mammal;
+Mammal.prototype.liveBirth = function liveBirth() {};
+
+const Human = function(age, furColor, languageSpoken) {
+  if (!(this instanceof Human)) {
+    throw new Error('Instantiate Human with `new`');
+  }
+
+  Mammal.call(this, age, furColor);
+  this.languageSpoken = languageSpoken;
+};
+
+Human.prototype = Object.create(Mammal.prototype);
+Human.prototype.constructor = Human;
+Human.prototype.speak = function speak() {};
+```
+
+**Gut:**
+```javascript
+class Animal {
+  constructor(age) {
+    this.age = age;
+  }
+
+  move() { /* ... */ }
+}
+
+class Mammal extends Animal {
+  constructor(age, furColor) {
+    super(age);
+    this.furColor = furColor;
+  }
+
+  liveBirth() { /* ... */ }
+}
+
+class Human extends Mammal {
+  constructor(age, furColor, languageSpoken) {
+    super(age, furColor);
+    this.languageSpoken = languageSpoken;
+  }
+
+  speak() { /* ... */ }
+}
+```
+**[⬆ nach oben](#table-of-contents)**
+
+### Verwende die Verkettung von Methoden
+Dieses Entwurfsmuster ist in JavaScript sehr nützlich und du wirst es in vielen 
+Bibliotheken, wie beispielsweise in jQuery und Lodash finden. Es erlaubt deinem 
+Code mehr aussagekräftig und weniger langatmig zu sein. Aus diesem Grund würde 
+ich sagen, verwende die Methoden-Verkettung und schaue dir an, wie sauber dein 
+Code sein wird. Gebe in deinen Klassen-Methoden am Ende jeder Funktion 
+einfach `this` zurück und du wirst weitere Methoden verketten können.
+
+**Schlecht:**
+```javascript
+class Car {
+  constructor() {
+    this.make = 'Honda';
+    this.model = 'Accord';
+    this.color = 'white';
+  }
+
+  setMake(make) {
+    this.make = make;
+  }
+
+  setModel(model) {
+    this.model = model;
+  }
+
+  setColor(color) {
+    this.color = color;
+  }
+
+  save() {
+    console.log(this.make, this.model, this.color);
+  }
+}
+
+const car = new Car();
+car.setColor('pink');
+car.setMake('Ford');
+car.setModel('F-150');
+car.save();
+```
+
+**Gut:**
+```javascript
+class Car {
+  constructor() {
+    this.make = 'Honda';
+    this.model = 'Accord';
+    this.color = 'white';
+  }
+
+  setMake(make) {
+    this.make = make;
+    // Anmerkung: Gebe this für die Verkettung zurück
+    return this;
+  }
+
+  setModel(model) {
+    this.model = model;
+    // Anmerkung: Gebe this für die Verkettung zurück
+    return this;
+  }
+
+  setColor(color) {
+    this.color = color;
+    // Anmerkung: Gebe this für die Verkettung zurück
+    return this;
+  }
+
+  save() {
+    console.log(this.make, this.model, this.color);
+    // Anmerkung: Gebe this für die Verkettung zurück
+    return this;
+  }
+}
+
+const car = new Car()
+  .setColor('pink')
+  .setMake('Ford')
+  .setModel('F-150')
+  .save();
+```
+**[⬆ nach oben](#table-of-contents)**
+
+### Komposition an Stelle von Vererbung
+Wie bekanntermaßen in [*Design Patterns*](https://en.wikipedia.org/wiki/Design_Patterns) von der Viererbande (Gang of Four) 
+gesagt wurde, sollst du die Komposition der Vererbung vorziehen, wenn du kannst. Es gibt viele gute Gründe die Vererbung zu verwenden 
+und eine Menge guter Gründe warum du die Komposition verwenden sollst. Der Kernpunkt dieses Denkansatzes ist, dass wenn dein Gehirn 
+instinktiv für die Vererbung ist, du versuchen sollst darüber nachzudenken, ob die Komposition dein Problem nicht besser lösen wird. 
+In manchen Fällen kann es das. 
+
+Du fragst dich vielleicht, wann du Vererbungen verwenden sollst? Es ist von deinem 
+vorliegenden Problem anhängig. Hier ist eine Liste mit Gründen die mehr für die Vererbung
+als für die Komposition sprechen:
+
+1. Deine Vererbung repräsentiert eine „ist-ein“-Beziehung und keine „hat-ein“-Beziehung 
+(Mensch->Tier vs. User->UserDetails).
+2. Du kannst Code von der Elternklasse verwenden (Menschen können sich wie alle Tiere bewegen).
+3. Du willst globale Änderungen – durch das Ändern der Elternklasse – auf abgeleitete Klassen übertragen. 
+(Den Kalorienverbrauch aller Tiere ändern wenn sie sich bewegen).
+
+**Schlecht:**
+```javascript
+class Employee {
+  constructor(name, email) {
+    this.name = name;
+    this.email = email;
+  }
+
+  // ...
+}
+
+// Schlecht, weil Angestellte Steuerdaten "besitzen". EmployeeTaxData ist keine Art eines Angestellten
+class EmployeeTaxData extends Employee {
+  constructor(ssn, salary) {
+    super();
+    this.ssn = ssn;
+    this.salary = salary;
+  }
+
+  // ...
+}
+```
+
+**Gut:**
+```javascript
+class EmployeeTaxData {
+  constructor(ssn, salary) {
+    this.ssn = ssn;
+    this.salary = salary;
+  }
+
+  // ...
+}
+
+class Employee {
+  constructor(name, email) {
+    this.name = name;
+    this.email = email;
+  }
+
+  setTaxData(ssn, salary) {
+    this.taxData = new EmployeeTaxData(ssn, salary);
+  }
+  // ...
+}
+```
+**[⬆ nach oben](#table-of-contents)**
+
+## <a id='classes'>SOLID</a>
 ### Single-Responsibility-Prinzip (SRP)
 Wie in Clean Code bereits genannt: „Es sollte niemals mehr als einen Grund geben, 
 eine Klasse zu ändern“. Es ist verlockend, eine Klasse bis obenhin mit Funktionalität 
@@ -1166,7 +1379,6 @@ class HttpRequester {
 }
 ```
 **[⬆ nach oben](#table-of-contents)**
-
 
 ### Liskovsches Substitutionsprinzip (LSP)
 Das ist ein beängstigender Begriff für ein sehr einfaches Konzept. Es ist 
@@ -1321,7 +1533,6 @@ const $ = new DOMTraverser({
   animationModule() {} // In den meisten Fällen werden wir nicht animieren müssen.
   // ...
 });
-
 ```
 
 **Gut:**
@@ -1454,230 +1665,6 @@ inventoryTracker.requestItems();
 ```
 **[⬆ nach oben](#table-of-contents)**
 
-### Ziehe ES2015-/ES6-Klassen einfachen ES5-Funktionen vor
-Es ist sehr schwer, lesbare Klassen-Vererbungen, Konstruktionen und Methoden-Definitionen mit 
-klassischen ES5-Klassen zu schreiben. Wenn du Vererbungen benötigst (und sei dir bewusst, dass 
-du es möglicherweise doch nicht brauchst), dann bevorzuge Klassen. Verwende schlanke 
-Funktionen bis du dir sicher bist, größere und komplexere Objekte zu benötigen.
-
-**Schlecht:**
-```javascript
-const Animal = function(age) {
-  if (!(this instanceof Animal)) {
-    throw new Error('Instantiate Animal with `new`');
-  }
-
-  this.age = age;
-};
-
-Animal.prototype.move = function move() {};
-
-const Mammal = function(age, furColor) {
-  if (!(this instanceof Mammal)) {
-    throw new Error('Instantiate Mammal with `new`');
-  }
-
-  Animal.call(this, age);
-  this.furColor = furColor;
-};
-
-Mammal.prototype = Object.create(Animal.prototype);
-Mammal.prototype.constructor = Mammal;
-Mammal.prototype.liveBirth = function liveBirth() {};
-
-const Human = function(age, furColor, languageSpoken) {
-  if (!(this instanceof Human)) {
-    throw new Error('Instantiate Human with `new`');
-  }
-
-  Mammal.call(this, age, furColor);
-  this.languageSpoken = languageSpoken;
-};
-
-Human.prototype = Object.create(Mammal.prototype);
-Human.prototype.constructor = Human;
-Human.prototype.speak = function speak() {};
-```
-
-**Gut:**
-```javascript
-class Animal {
-  constructor(age) {
-    this.age = age;
-  }
-
-  move() { /* ... */ }
-}
-
-class Mammal extends Animal {
-  constructor(age, furColor) {
-    super(age);
-    this.furColor = furColor;
-  }
-
-  liveBirth() { /* ... */ }
-}
-
-class Human extends Mammal {
-  constructor(age, furColor, languageSpoken) {
-    super(age, furColor);
-    this.languageSpoken = languageSpoken;
-  }
-
-  speak() { /* ... */ }
-}
-```
-**[⬆ nach oben](#table-of-contents)**
-
-
-### Verwende die Verkettung von Methoden
-Dieses Entwurfsmuster ist in JavaScript sehr nützlich und du wirst es in vielen 
-Bibliotheken, wie beispielsweise in jQuery und Lodash finden. Es erlaubt deinem 
-Code mehr aussagekräftig und weniger langatmig zu sein. Aus diesem Grund würde 
-ich sagen, verwende die Methoden-Verkettung und schaue dir an, wie sauber dein 
-Code sein wird. Gebe in deinen Klassen-Methoden am Ende jeder Funktion 
-einfach `this` zurück und du wirst weitere Methoden verketten können.
-
-**Schlecht:**
-```javascript
-class Car {
-  constructor() {
-    this.make = 'Honda';
-    this.model = 'Accord';
-    this.color = 'white';
-  }
-
-  setMake(make) {
-    this.make = make;
-  }
-
-  setModel(model) {
-    this.model = model;
-  }
-
-  setColor(color) {
-    this.color = color;
-  }
-
-  save() {
-    console.log(this.make, this.model, this.color);
-  }
-}
-
-const car = new Car();
-car.setColor('pink');
-car.setMake('Ford');
-car.setModel('F-150');
-car.save();
-```
-
-**Gut:**
-```javascript
-class Car {
-  constructor() {
-    this.make = 'Honda';
-    this.model = 'Accord';
-    this.color = 'white';
-  }
-
-  setMake(make) {
-    this.make = make;
-    // Anmerkung: Gebe this für die Verkettung zurück
-    return this;
-  }
-
-  setModel(model) {
-    this.model = model;
-    // Anmerkung: Gebe this für die Verkettung zurück
-    return this;
-  }
-
-  setColor(color) {
-    this.color = color;
-    // Anmerkung: Gebe this für die Verkettung zurück
-    return this;
-  }
-
-  save() {
-    console.log(this.make, this.model, this.color);
-    // Anmerkung: Gebe this für die Verkettung zurück
-    return this;
-  }
-}
-
-const car = new Car()
-  .setColor('pink')
-  .setMake('Ford')
-  .setModel('F-150')
-  .save();
-```
-**[⬆ nach oben](#table-of-contents)**
-
-### Komposition an Stelle von Vererbung
-Wie bekanntermaßen in [*Design Patterns*](https://en.wikipedia.org/wiki/Design_Patterns) von der Viererbande (Gang of Four) 
-gesagt wurde, sollst du die Komposition der Vererbung vorziehen, wenn du kannst. Es gibt viele gute Gründe die Vererbung zu verwenden 
-und eine Menge guter Gründe warum du die Komposition verwenden sollst. Der Kernpunkt dieses Denkansatzes ist, dass wenn dein Gehirn 
-instinktiv für die Vererbung ist, du versuchen sollst darüber nachzudenken, ob die Komposition dein Problem nicht besser lösen wird. 
-In manchen Fällen kann es das. 
-
-Du fragst dich vielleicht, wann du Vererbungen verwenden sollst? Es ist von deinem 
-vorliegenden Problem anhängig. Hier ist eine Liste mit Gründen die mehr für die Vererbung
-als für die Komposition sprechen:
-
-1. Deine Vererbung repräsentiert eine „ist-ein“-Beziehung und keine „hat-ein“-Beziehung 
-(Mensch->Tier vs. User->UserDetails).
-2. Du kannst Code von der Elternklasse verwenden (Menschen können sich wie alle Tiere bewegen).
-3. Du willst globale Änderungen – durch das Ändern der Elternklasse – auf abgeleitete Klassen übertragen. 
-(Den Kalorienverbrauch aller Tiere ändern wenn sie sich bewegen).
-
-**Schlecht:**
-```javascript
-class Employee {
-  constructor(name, email) {
-    this.name = name;
-    this.email = email;
-  }
-
-  // ...
-}
-
-// Schlecht, weil Angestellte Steuerdaten "besitzen". EmployeeTaxData ist keine Art eines Angestellten
-class EmployeeTaxData extends Employee {
-  constructor(ssn, salary) {
-    super();
-    this.ssn = ssn;
-    this.salary = salary;
-  }
-
-  // ...
-}
-```
-
-**Gut:**
-```javascript
-class EmployeeTaxData {
-  constructor(ssn, salary) {
-    this.ssn = ssn;
-    this.salary = salary;
-  }
-
-  // ...
-}
-
-class Employee {
-  constructor(name, email) {
-    this.name = name;
-    this.email = email;
-  }
-
-  setTaxData(ssn, salary) {
-    this.taxData = new EmployeeTaxData(ssn, salary);
-  }
-  // ...
-}
-```
-**[⬆ nach oben](#table-of-contents)**
-
 ## <a id='testing'>Testing</a>
 Testing ist wichtiger als das Veröffentlichen von Code. Wenn du keine oder eine unzureichende 
 Anzahl an Tests hast, dann wirst du jedes Mal unsicher sein, ob du nicht irgendetwas
@@ -1753,11 +1740,14 @@ Mit ES2015/ES6 sind Promises ein integrierter globaler Typ. Verwende sie!
 
 **Schlecht:**
 ```javascript
-require('request').get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin', (requestErr, response) => {
+import { get } from 'request';
+import { writeFile } from 'fs';
+
+get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin', (requestErr, response) => {
   if (requestErr) {
     console.error(requestErr);
   } else {
-    require('fs').writeFile('article.html', response.body, (writeErr) => {
+    writeFile('article.html', response.body, (writeErr) => {
       if (writeErr) {
         console.error(writeErr);
       } else {
@@ -1766,14 +1756,16 @@ require('request').get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin', (req
     });
   }
 });
-
 ```
 
 **Gut:**
 ```javascript
-require('request-promise').get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin')
+import { get } from 'request';
+import { writeFile } from 'fs';
+
+get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin')
   .then((response) => {
-    return require('fs-promise').writeFile('article.html', response);
+    return writeFile('article.html', response);
   })
   .then(() => {
     console.log('File written');
@@ -1781,7 +1773,6 @@ require('request-promise').get('https://en.wikipedia.org/wiki/Robert_Cecil_Marti
   .catch((err) => {
     console.error(err);
   });
-
 ```
 **[⬆ nach oben](#table-of-contents)**
 
@@ -1794,9 +1785,12 @@ schon nutzen kannst!
 
 **Schlecht:**
 ```javascript
-require('request-promise').get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin')
+import { get } from 'request-promise';
+import { writeFile } from 'fs-promise';
+
+get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin')
   .then((response) => {
-    return require('fs-promise').writeFile('article.html', response);
+    return writeFile('article.html', response);
   })
   .then(() => {
     console.log('File written');
@@ -1804,15 +1798,17 @@ require('request-promise').get('https://en.wikipedia.org/wiki/Robert_Cecil_Marti
   .catch((err) => {
     console.error(err);
   });
-
 ```
 
 **Gut:**
 ```javascript
+import { get } from 'request-promise';
+import { writeFile } from 'fs-promise';
+
 async function getCleanCodeArticle() {
   try {
-    const response = await require('request-promise').get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin');
-    await require('fs-promise').writeFile('article.html', response);
+    const response = await get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin');
+    await writeFile('article.html', response);
     console.log('File written');
   } catch(err) {
     console.error(err);
@@ -1820,7 +1816,6 @@ async function getCleanCodeArticle() {
 }
 ```
 **[⬆ nach oben](#table-of-contents)**
-
 
 ## <a id='error-handling'>Fehlerbehandlung</a>
 Ausgegebene Fehler sind eine gute Sache! Das heißt, dass die Laufzeitumgebung
@@ -1892,9 +1887,7 @@ getdata()
   // ODER wende alle drei an!
 });
 ```
-
 **[⬆ nach oben](#table-of-contents)**
-
 
 ## <a id='formatting'>Formatierung</a>
 Formatierungen sind subjektiv. Wie bei vielen anderen Regeln hier gibt es kein
@@ -2028,7 +2021,6 @@ class PerformanceReview {
 const review = new PerformanceReview(employee);
 review.perfReview();
 ```
-
 **[⬆ nach oben](#table-of-contents)**
 
 ## <a id='comments'>Kommentare</a>
@@ -2160,13 +2152,16 @@ const actions = function() {
 ## <a id='translation'>Übersetzungen</a>
 Dieser Leitfaden ist in den folgenden Sprachen verfügbar:
 
+- ![br](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) **Brasilianisches Portugiesisch**: [fesnt/clean-code-javascript](https://github.com/fesnt/clean-code-javascript)
+- ![es](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Uruguay.png) **Spanisch**: [andersontr15/clean-code-javascript]
 - ![en](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags-iso/shiny/24/US.png) **Englisch**: [ryanmcdermott/clean-code-javascript](https://github.com/ryanmcdermott/clean-code-javascript)
-- ![br](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) **Brazilian Portuguese**: [fesnt/clean-code-javascript](https://github.com/fesnt/clean-code-javascript)
-- ![cn](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **Chinese**: [alivebao/clean-code-js](https://github.com/alivebao/clean-code-js)
-- ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [qkraudghgh/clean-code-javascript-ko](https://github.com/qkraudghgh/clean-code-javascript-ko)
-- ![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) **Russian**:
-  - [BoryaMogila/clean-code-javascript-ru/](https://github.com/BoryaMogila/clean-code-javascript-ru/)
-  - [maksugr/clean-code-javascript](https://github.com/maksugr/clean-code-javascript)
-- ![vi](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Vietnam.png) **Vietnamese**: [hienvd/clean-code-javascript/](https://github.com/hienvd/clean-code-javascript/)
+- ![cn](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **Chinesisch**:
+    - [alivebao/clean-code-js](https://github.com/alivebao/clean-code-js)
+    - [beginor/clean-code-javascript](https://github.com/beginor/clean-code-javascript)
+- ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Koreanisch**: [qkraudghgh/clean-code-javascript-ko](https://github.com/qkraudghgh/clean-code-javascript-ko)
+- ![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) **Russisch**:
+    - [BoryaMogila/clean-code-javascript-ru/](https://github.com/BoryaMogila/clean-code-javascript-ru/)
+    - [maksugr/clean-code-javascript](https://github.com/maksugr/clean-code-javascript)
+- ![vi](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Vietnam.png) **Vietnamesisch**: [hienvd/clean-code-javascript/](https://github.com/hienvd/clean-code-javascript/)
 
 **[⬆ nach oben](#table-of-contents)**
