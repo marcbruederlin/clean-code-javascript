@@ -2153,7 +2153,7 @@ const actions = function() {
 Dieser Leitfaden ist in den folgenden Sprachen verfügbar:
 
 - ![br](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) **Brasilianisches Portugiesisch**: [fesnt/clean-code-javascript](https://github.com/fesnt/clean-code-javascript)
-- ![es](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Uruguay.png) **Spanisch**: [andersontr15/clean-code-javascript]
+  - ![es](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Uruguay.png) **Spanisch**: [andersontr15/clean-code-javascript](https://github.com/andersontr15/clean-code-javascript-es)
 - ![en](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags-iso/shiny/24/US.png) **Englisch**: [ryanmcdermott/clean-code-javascript](https://github.com/ryanmcdermott/clean-code-javascript)
 - ![cn](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **Chinesisch**:
     - [alivebao/clean-code-js](https://github.com/alivebao/clean-code-js)
