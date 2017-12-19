@@ -113,7 +113,7 @@ saveCityZipCode(city, zipCode);
 **[⬆ nach oben](#table-of-contents)**
 
 ### Vermeide Mental Mapping
-Explizites ist besser als Im­pli­zites.
+Explizites ist besser als Implizites.
 
 **Schlecht:**
 ```javascript
@@ -266,13 +266,13 @@ function emailClients(clients) {
 
 **Gut:**
 ```javascript
-function emailClients(clients) {
+function emailActiveClients(clients) {
   clients
-    .filter(isClientActive)
+    .filter(isActiveClient)
     .forEach(email);
 }
 
-function isClientActive(client) {
+function isActiveClient(client) {
   const clientRecord = database.lookup(client);
   return clientRecord.isActive();
 }
@@ -289,7 +289,7 @@ function addToDate(date, month) {
 
 const date = new Date();
 
-// Es ist schwierig zu sagen was hinzugefügt wird
+// Es ist schwierig zu sagen was laut Funktionsnamen hinzugefügt wird
 addToDate(date, 1);
 ```
 
@@ -434,17 +434,19 @@ function showEmployeeList(employees) {
     const expectedSalary = employee.calculateExpectedSalary();
     const experience = employee.getExperience();
 
-    let portfolio = employee.getGithubLink();
-
-    if (employee.type === 'manager') {
-      portfolio = employee.getMBAProjects();
-    }
-
     const data = {
       expectedSalary,
-      experience,
-      portfolio
+      experience
     };
+
+    switch (employee.type) {
+      case 'manager':
+        data.portfolio = employee.getMBAProjects();
+        break;
+      case 'developer':
+        data.githubLink = employee.getGithubLink();
+        break;
+    }
 
     render(data);
   });
@@ -467,7 +469,7 @@ function createMenu(config) {
   config.title = config.title || 'Foo';
   config.body = config.body || 'Bar';
   config.buttonText = config.buttonText || 'Baz';
-  config.cancellable = config.cancellable === undefined ? config.cancellable : true;
+  config.cancellable = config.cancellable !== undefined ? config.cancellable : true;
 }
 
 createMenu(menuConfig);
@@ -612,7 +614,7 @@ const addItemToCart = (cart, item) => {
 **Gut:**
 ```javascript
 const addItemToCart = (cart, item) => {
-  return [...cart, { item, date : Date.now() }];
+  return [...cart, { item, date: Date.now() }];
 };
 ```
 
@@ -697,11 +699,9 @@ const programmerOutput = [
   }
 ];
 
-const INITIAL_VALUE = 0;
-
 const totalOutput = programmerOutput
-  .map((programmer) => programmer.linesOfCode)
-  .reduce((acc, linesOfCode) => acc + linesOfCode, INITIAL_VALUE);
+  .map(output => output.linesOfCode)
+  .reduce((totalLines, lines) => totalLines + lines);
 ```
 **[⬆ nach oben](#table-of-contents)**
 
@@ -959,7 +959,7 @@ function makeBankAccount() {
 
   // Ein "Setter", wird duch das unten zurückgegebene Objekt public gemacht
   function setBalance(amount) {
-    // ... validieren, bevor der Kontostand aktualisiert wird
+    // ... validieren bevor der Kontostand aktualisiert wird
     balance = amount;
   }
 
@@ -1098,10 +1098,10 @@ einfach `this` zurück und du wirst weitere Methoden verketten können.
 **Schlecht:**
 ```javascript
 class Car {
-  constructor() {
-    this.make = 'Honda';
-    this.model = 'Accord';
-    this.color = 'white';
+  constructor(make, model, color) {
+    this.make = make;
+    this.model = model;
+    this.color = color;
   }
 
   setMake(make) {
@@ -1121,51 +1121,47 @@ class Car {
   }
 }
 
-const car = new Car();
+const car = new Car('Ford','F-150','red');
 car.setColor('pink');
-car.setMake('Ford');
-car.setModel('F-150');
 car.save();
 ```
 
 **Gut:**
 ```javascript
 class Car {
-  constructor() {
-    this.make = 'Honda';
-    this.model = 'Accord';
-    this.color = 'white';
+  constructor(make, model, color) {
+    this.make = make;
+    this.model = model;
+    this.color = color;
   }
 
   setMake(make) {
     this.make = make;
-    // Anmerkung: Gebe this für die Verkettung zurück
+    // Anmerkung: Gebe „this“ für die Verkettung zurück
     return this;
   }
 
   setModel(model) {
     this.model = model;
-    // Anmerkung: Gebe this für die Verkettung zurück
+    // Anmerkung: Gebe „this“ für die Verkettung zurück
     return this;
   }
 
   setColor(color) {
     this.color = color;
-    // Anmerkung: Gebe this für die Verkettung zurück
+    // Anmerkung: Gebe „this“ für die Verkettung zurück
     return this;
   }
 
   save() {
     console.log(this.make, this.model, this.color);
-    // Anmerkung: Gebe this für die Verkettung zurück
+    // Anmerkung: Gebe „this“ für die Verkettung zurück
     return this;
   }
 }
 
-const car = new Car()
+const car = new Car('Ford','F-150','red')
   .setColor('pink')
-  .setMake('Ford')
-  .setModel('F-150')
   .save();
 ```
 **[⬆ nach oben](#table-of-contents)**
@@ -1276,7 +1272,6 @@ class UserAuth {
     // ...
   }
 }
-
 
 class UserSettings {
   constructor(user) {
@@ -1686,7 +1681,7 @@ du die Abdeckungsziele erreichst bevor ein Feature veröffentlicht oder vorhande
 
 **Schlecht:**
 ```javascript
-const assert = require('assert');
+import assert from 'assert';
 
 describe('MakeMomentJSGreatAgain', () => {
   it('handles date boundaries', () => {
@@ -1709,7 +1704,7 @@ describe('MakeMomentJSGreatAgain', () => {
 
 **Gut:**
 ```javascript
-const assert = require('assert');
+import assert from 'assert';
 
 describe('MakeMomentJSGreatAgain', () => {
   it('handles 30-day months', () => {
@@ -1863,29 +1858,29 @@ ignorieren solltest.
 **Schlecht:**
 ```javascript
 getdata()
-.then((data) => {
-  functionThatMightThrow(data);
-})
-.catch((error) => {
-  console.log(error);
-});
+  .then((data) => {
+    functionThatMightThrow(data);
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 ```
 
 **Gut:**
 ```javascript
 getdata()
-.then((data) => {
-  functionThatMightThrow(data);
-})
-.catch((error) => {
-  // Eine Option (Erweckt mehr Aufmerksamkeit als console.log):
-  console.error(error);
-  // Eine andere Möglichkeit:
-  notifyUserOfError(error);
-  // Eine andere Möglichkeit:
-  reportErrorToService(error);
-  // ODER wende alle drei an!
-});
+  .then((data) => {
+    functionThatMightThrow(data);
+  })
+  .catch((error) => {
+    // Eine Option (Erweckt mehr Aufmerksamkeit als console.log):
+    console.error(error);
+    // Eine andere Möglichkeit:
+    notifyUserOfError(error);
+    // Eine andere Möglichkeit:
+    reportErrorToService(error);
+    // ODER wende alle drei an!
+  });
 ```
 **[⬆ nach oben](#table-of-contents)**
 
@@ -1925,8 +1920,8 @@ class Alpaca {}
 const DAYS_IN_WEEK = 7;
 const DAYS_IN_MONTH = 30;
 
-const songs = ['Back In Black', 'Stairway to Heaven', 'Hey Jude'];
-const artists = ['ACDC', 'Led Zeppelin', 'The Beatles'];
+const SONGS = ['Back In Black', 'Stairway to Heaven', 'Hey Jude'];
+const ARTISTS = ['ACDC', 'Led Zeppelin', 'The Beatles'];
 
 function eraseDatabase() {}
 function restoreDatabase() {}
@@ -1979,7 +1974,7 @@ class PerformanceReview {
   }
 }
 
-const review = new PerformanceReview(user);
+const review = new PerformanceReview(employee);
 review.perfReview();
 ```
 
@@ -2060,7 +2055,7 @@ function hashIt(data) {
     const char = data.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
 
-    // Convert to 32-bit integer
+    // Zu einem 32-bit Integer konvertieren
     hash &= hash;
   }
 }
@@ -2159,9 +2154,12 @@ Dieser Leitfaden ist in den folgenden Sprachen verfügbar:
     - [alivebao/clean-code-js](https://github.com/alivebao/clean-code-js)
     - [beginor/clean-code-javascript](https://github.com/beginor/clean-code-javascript)
 - ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Koreanisch**: [qkraudghgh/clean-code-javascript-ko](https://github.com/qkraudghgh/clean-code-javascript-ko)
+- ![pl](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Poland.png) **Polnisch**: [greg-dev/clean-code-javascript-pl](https://github.com/greg-dev/clean-code-javascript-pl)
 - ![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) **Russisch**:
     - [BoryaMogila/clean-code-javascript-ru/](https://github.com/BoryaMogila/clean-code-javascript-ru/)
     - [maksugr/clean-code-javascript](https://github.com/maksugr/clean-code-javascript)
 - ![vi](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Vietnam.png) **Vietnamesisch**: [hienvd/clean-code-javascript/](https://github.com/hienvd/clean-code-javascript/)
+- ![ja](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Japan.png) **Japanisch**: [mitsuruog/clean-code-javascript/](https://github.com/mitsuruog/clean-code-javascript/)
+- ![id](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Indonesia.png) **Indonesisch**: [andirkh/clean-code-javascript/](https://github.com/andirkh/clean-code-javascript/)
 
 **[⬆ nach oben](#table-of-contents)**
