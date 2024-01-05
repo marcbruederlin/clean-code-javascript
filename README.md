@@ -374,7 +374,7 @@ function parseBetterJSAlternative(code) {
 **[⬆ nach oben](#table-of-contents)**
 
 ### Entferne doppelten Code
-Gebe dein absolut bestes um doppelten Code zu vermeiden. Doppelter Code ist schlecht
+Gib dein absolut bestes um doppelten Code zu vermeiden. Doppelter Code ist schlecht
 weil es bedeutet, dass es mehr als eine Stelle gibt um etwas anzupassen, wenn an dieser
 Logik etwas geändert werden soll.
 
@@ -1092,7 +1092,7 @@ Dieses Entwurfsmuster ist in JavaScript sehr nützlich und du wirst es in vielen
 Bibliotheken, wie beispielsweise in jQuery und Lodash finden. Es erlaubt deinem 
 Code mehr aussagekräftig und weniger langatmig zu sein. Aus diesem Grund würde 
 ich sagen, verwende die Methoden-Verkettung und schaue dir an, wie sauber dein 
-Code sein wird. Gebe in deinen Klassen-Methoden am Ende jeder Funktion 
+Code sein wird. Gib in deinen Klassen-Methoden am Ende jeder Funktion 
 einfach `this` zurück und du wirst weitere Methoden verketten können.
 
 **Schlecht:**
@@ -1137,25 +1137,25 @@ class Car {
 
   setMake(make) {
     this.make = make;
-    // Anmerkung: Gebe „this“ für die Verkettung zurück
+    // Anmerkung: Gib „this“ für die Verkettung zurück
     return this;
   }
 
   setModel(model) {
     this.model = model;
-    // Anmerkung: Gebe „this“ für die Verkettung zurück
+    // Anmerkung: Gib „this“ für die Verkettung zurück
     return this;
   }
 
   setColor(color) {
     this.color = color;
-    // Anmerkung: Gebe „this“ für die Verkettung zurück
+    // Anmerkung: Gib „this“ für die Verkettung zurück
     return this;
   }
 
   save() {
     console.log(this.make, this.model, this.color);
-    // Anmerkung: Gebe „this“ für die Verkettung zurück
+    // Anmerkung: Gib „this“ für die Verkettung zurück
     return this;
   }
 }
@@ -1318,22 +1318,22 @@ class HttpRequester {
   fetch(url) {
     if (this.adapter.name === 'ajaxAdapter') {
       return makeAjaxCall(url).then((response) => {
-        // transformiere die Response und gebe sie zurück
+        // transformiere die Response und gib sie zurück
       });
     } else if (this.adapter.name === 'httpNodeAdapter') {
       return makeHttpCall(url).then((response) => {
-        // transformiere die Response und gebe sie zurück
+        // transformiere die Response und gib sie zurück
       });
     }
   }
 }
 
 function makeAjaxCall(url) {
-  // führe den Request aus und gebe eine Promise zurück
+  // führe den Request aus und gib eine Promise zurück
 }
 
 function makeHttpCall(url) {
-  // führe den Request aus und gebe eine Promise zurück
+  // führe den Request aus und gib eine Promise zurück
 }
 ```
 
@@ -1346,7 +1346,7 @@ class AjaxAdapter extends Adapter {
   }
 
   request(url) {
-    // führe den Request aus und gebe eine Promise zurück
+    // führe den Request aus und gib eine Promise zurück
   }
 }
 
@@ -1357,7 +1357,7 @@ class NodeAdapter extends Adapter {
   }
 
   request(url) {
-    // führe den Request aus und gebe eine Promise zurück
+    // führe den Request aus und gib eine Promise zurück
   }
 }
 
@@ -1368,7 +1368,7 @@ class HttpRequester {
 
   fetch(url) {
     return this.adapter.request(url).then((response) => {
-      // transformiere die Response und gebe sie zurück
+      // transformiere die Response und gib sie zurück
     });
   }
 }
